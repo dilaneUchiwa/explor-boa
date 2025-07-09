@@ -52,10 +52,55 @@ def tourist_sites_map(request):
 @login_required
 def tourist_sites_api(request):
     """API pour récupérer les sites touristiques en JSON (pour la carte)"""
+    from apps.business.models import BusinessLocation
+    from math import radians, cos, sin, asin, sqrt
+    
+    def haversine(lat1, lon1, lat2, lon2):
+        """Calcule la distance entre deux points géographiques en km"""
+        R = 6371  # Rayon de la Terre en km
+        
+        lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+        dlat = lat2 - lat1
+        dlon = lon2 - lon1
+        
+        a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+        c = 2 * asin(sqrt(a))
+        return R * c
+    
     sites = TouristSite.objects.filter(is_active=True).select_related('category')
     
     sites_data = []
     for site in sites:
+        # Trouver les business locations à proximité (dans un rayon de 10km)
+        nearby_businesses = []
+        business_locations = BusinessLocation.objects.filter(
+            is_active=True,
+            latitude__isnull=False,
+            longitude__isnull=False
+        )
+        
+        for business_loc in business_locations:
+            distance = haversine(
+                float(site.latitude), float(site.longitude),
+                float(business_loc.latitude), float(business_loc.longitude)
+            )
+            
+            # Si la business location est à moins de 10km du site
+            if distance <= 10:
+                nearby_businesses.append({
+                    'id': business_loc.id,
+                    'name': business_loc.name,
+                    'type': business_loc.get_business_location_type_display(),
+                    'distance': round(distance, 1),
+                    'business_id': business_loc.business.id if business_loc.business else None,
+                    'business_name': business_loc.business.name if business_loc.business else '',
+                    'url': f'/business/location/{business_loc.id}/'
+                })
+        
+        # Trier par distance et prendre les 3 plus proches
+        nearby_businesses.sort(key=lambda x: x['distance'])
+        nearby_businesses = nearby_businesses[:3]
+        
         site_data = {
             'id': site.id,
             'name': site.name,
@@ -63,6 +108,7 @@ def tourist_sites_api(request):
             'latitude': float(site.latitude),
             'longitude': float(site.longitude),
             'category': site.category.name if site.category else None,
+            'nearby_businesses': nearby_businesses,
         }
         sites_data.append(site_data)
     

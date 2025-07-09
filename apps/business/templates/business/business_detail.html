@@ -44,9 +44,9 @@
                         <div class="text-muted mb-2">{% translate "Aucune photo d'entreprise n'est disponible." %}</div>
                         {% if is_owner %}
                             {% if main_location and main_location.pk %}
-                                <a href="{% url 'business:location_edit' main_location.pk %}" class="btn btn-gradient-green btn-sm mt-2">
-                                    <i class="fas fa-plus me-1"></i>{% translate "Ajouter une photo" %}
-                                </a>
+                        <a href="{% url 'business:location_edit' main_location.pk %}" class="btn btn-gradient-green btn-sm mt-2">
+                            <i class="fas fa-plus me-1"></i>{% translate "Ajouter une photo" %}
+                        </a>
                             {% else %}
                                 <a href="{% url 'business:location_create' business.pk %}" class="btn btn-gradient-green btn-sm mt-2">
                                     <i class="fas fa-map-marker-alt me-1"></i>{% translate "Ajouter une localisation" %}

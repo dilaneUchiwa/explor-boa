@@ -252,6 +252,7 @@ def business_create(request):
             context = {
                 'title': _('Create Business Profile'),
                 'business': None,
+                'main_location': None,
                 'form_data': {
                     'name': name,
                     'email': email,
@@ -308,6 +309,7 @@ def business_create(request):
             context = {
                 'title': _('Create Business Profile'),
                 'business': None,
+                'main_location': None,
                 'form_data': {
                     'name': name,
                     'email': email,
@@ -323,6 +325,7 @@ def business_create(request):
     context = {
         'title': _('Create Business Profile'),
         'business': None,
+        'main_location': None,
         'form_data': {
             'name': '',
             'email': '',
@@ -393,13 +396,14 @@ def business_edit(request, pk):
                 errors.append(_("Le format de la date de création n'est pas valide."))
         else:
             founded_date = None
-
+    
         if errors:
             for error in errors:
                 messages.error(request, error)
             context = {
                 'title': _('Edit Business Profile'),
                 'business': business,
+                'main_location': business.locations.filter(is_main_location=True).first() if business else None,
                 'form_data': {
                     'name': name,
                     'email': email,
@@ -456,8 +460,9 @@ def business_edit(request, pk):
         except Exception as e:
             messages.error(request, _("Une erreur s'est produite lors de la mise à jour de l'entreprise."))
             context = {
-                'title': _('Edit Business Profile'),
+        'title': _('Edit Business Profile'),
                 'business': business,
+                'main_location': business.locations.filter(is_main_location=True).first() if business else None,
                 'form_data': {
                     'name': name,
                     'email': email,
@@ -473,6 +478,7 @@ def business_edit(request, pk):
     context = {
         'title': _('Edit Business Profile'),
         'business': business,
+        'main_location': business.locations.filter(is_main_location=True).first() if business else None,
         'form_data': {
             'name': business.name,
             'email': business.email,

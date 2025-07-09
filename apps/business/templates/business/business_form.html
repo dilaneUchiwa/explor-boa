@@ -283,8 +283,6 @@
             </div>
 
             <!-- Liste des documents existants -->
-            {% if business %}
-            {% with main_location=business.locations.filter.is_main_location=True|first %}
             {% if main_location and main_location.documents.all %}
             <div class="mt-4">
                 <h5>{% translate "Documents existants" %}</h5>
@@ -295,21 +293,13 @@
                             <h6 class="mb-1">{{ document.title }}</h6>
                             <small class="text-muted">{{ document.get_document_type_display }} - {{
                                 document.get_file_size_display }}</small>
-                            {% if document.description %}
-                            <br><small class="text-muted">{{ document.description }}</small>
-                            {% endif %}
                         </div>
-                        <div>
-                            <a href="{{ document.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
-                                <i class="fas fa-download"></i> {% translate "Télécharger" %}
-                            </a>
-                        </div>
+                        <a href="{{ document.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">{%
+                            translate "Voir" %}</a>
                     </div>
                     {% endfor %}
                 </div>
             </div>
-            {% endif %}
-            {% endwith %}
             {% endif %}
         </div>
 
